@@ -20,7 +20,7 @@ for producto in listaproductos:
     links_productos.append(link)
 #print(links_productos)
 b=' Cargando'
-with open(r'C:\Users\W4MP1\Desktop\info.txt', 'w') as file:
+with open ("info.txt","w") as file:
     file.write('Título' + '\t' + 'Precio' +'\t'+ 'Link\n')
     for link in links_productos:
         r = requests.get(link, headers=headers).text
