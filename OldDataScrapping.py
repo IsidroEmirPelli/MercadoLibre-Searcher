@@ -23,41 +23,42 @@ Excel = xlsxwriter.Workbook(filepath + r'\Desktop\Datos.xlsx') #Creamos Excel
 wsheet = Excel.add_worksheet()
 
 fila = 1
-titulos = []
-precios = []
-monedas = []
-links = []
+
+links_productos = []
 sig = True
 wsheet.write(0, 0, 'Título')
 wsheet.write(0, 1, 'Moneda')
 wsheet.write(0, 2, 'Precio')
 wsheet.write(0, 3, 'Link')
 while(sig):
-    titulos.clear()
-    precios.clear()
-    monedas.clear()
-    links.clear()
+    links_productos.clear()
     #print('Lista desde 0')
     for producto in listaproductos:
         #print(len(listaproductos))
-
-        titulo = producto.find("h2",{"class":"ui-search-item__title"}).text.replace('\n','') #El primer atributo "a" crea un enlace a archivos o una URL. Utilizo ".get()" para obtener el atributo "href" que es una referencia a una URL.
-        titulos.append(titulo)
-
-        precio = producto.find('span',{'class':'price-tag-fraction'}).text
-        precios.append(precio)
-
-        moneda = producto.find('span',{'class':'price-tag-symbol'}).text
-        monedas.append(moneda)
-
-        link = producto.find("a",{"class":"ui-search-link"}).get('href')
-        links.append(link)
+        link = producto.find("a",{"class":"ui-search-link"}).get('href') #El primer atributo "a" crea un enlace a archivos o una URL. Utilizo ".get()" para obtener el atributo "href" que es una referencia a una URL.
+        links_productos.append(link)
     b=' Cargando'
-    for titulo, precio, moneda, link in zip(titulos, precios, monedas, links):
+    for link in links_productos:
+        r = requests.get(link, headers=headers).text
+        hun = BeautifulSoup(r, 'html.parser')
+        try:
+            Titulo = hun.find('h1', {'class':'ui-pdp-title'}).text.replace('\n','')
+        except:
+            Titulo = None
+        #print(Titulo)
+        try:
+            Precio = hun.find('span',{'class':'price-tag-fraction'}).text
+        except:
+            Precio = None
+        #print(Precio)
+        try:
+            Signo = hun.find('span',{'class':'price-tag-symbol'}).text
+        except:
+            Signo = None
         #print(Signo)   
-        wsheet.write(fila,0,titulo)
-        wsheet.write(fila,1,moneda)
-        wsheet.write(fila,2,(precio))
+        wsheet.write(fila,0,Titulo)
+        wsheet.write(fila,1,Signo)
+        wsheet.write(fila,2,Precio)
         wsheet.write(fila,3,link)
         fila+=1
         for i in range(1,4):
