@@ -24,6 +24,7 @@ wsheet = Excel.add_worksheet()
 
 fila = 1
 titulos = []
+cuotas = []
 precios = []
 monedas = []
 links = []
@@ -31,11 +32,13 @@ sig = True
 wsheet.write(0, 0, 'Título')
 wsheet.write(0, 1, 'Moneda')
 wsheet.write(0, 2, 'Precio')
-wsheet.write(0, 3, 'Link')
+wsheet.write(0, 3, 'C/S')
+wsheet.write(0, 4, 'Link')
 while(sig):
     titulos.clear()
     precios.clear()
     monedas.clear()
+    cuotas.clear()
     links.clear()
     #print('Lista desde 0')
     for producto in listaproductos:
@@ -50,22 +53,29 @@ while(sig):
         moneda = producto.find('span',{'class':'price-tag-symbol'}).text
         monedas.append(moneda)
 
+        try:
+            cuota = producto.find('span',{'class':'ui-search-item__group__element ui-search-installments ui-search-color--LIGHT_GREEN'}).text
+            cuotas.append('Si')
+        except:
+            cuotas.append('No')
+            
         link = producto.find("a",{"class":"ui-search-link"}).get('href')
         links.append(link)
     b=' Cargando'
-    for titulo, precio, moneda, link in zip(titulos, precios, monedas, links):
+    for titulo, precio,cuota, moneda, link in zip(titulos, precios,cuotas, monedas, links):
         #print(Signo)   
         wsheet.write(fila,0,titulo)
         wsheet.write(fila,1,moneda)
-        wsheet.write(fila,2,(precio))
-        wsheet.write(fila,3,link)
+        wsheet.write(fila,2,precio)
+        wsheet.write(fila,3,cuota)
+        wsheet.write(fila,4,link)
         fila+=1
         for i in range(1,4):
             sys.stdout.write(b + "." * i +'\r')
             sys.stdout.flush()
             time.sleep(0.1)
             sys.stdout.write('\033[2K\033[1G')
-    print('Termine archivo')
+    #print('Termine archivo')
     try:
         link_sig = soup.find('div',{'class':'ui-search-pagination'})
         link_sig = link_sig.find('li',{'class':'andes-pagination__button andes-pagination__button--next'}) #Buscamos la "li" que contenga el sig.
@@ -73,7 +83,7 @@ while(sig):
         r = requests.get(link_sig).text
         soup=BeautifulSoup(r,'html.parser')
         listaproductos = soup.find_all('div',{"class":"ui-search-result__content-wrapper"})
-        print('Pág. siguiente')
+        #print('Pág. siguiente')
     except:
         sig = False
 Excel.close()
