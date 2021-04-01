@@ -28,6 +28,7 @@ cuotas = []
 precios = []
 monedas = []
 links = []
+#datos = {'titulos': [],'cuotas': [], 'precios': [],'monedas': [],'links': []}
 sig = True
 wsheet.write(0, 0, 'Título')
 wsheet.write(0, 1, 'Moneda')
